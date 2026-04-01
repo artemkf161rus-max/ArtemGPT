@@ -3,16 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ArtemGPT - AI с характером</title>
-    <!-- Подключаем Highlight.js для подсветки кода -->
+    <title>ArtemGPT</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/javascript.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/html.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/css.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -35,7 +28,6 @@
             height: 90vh;
         }
         
-        /* Боковая панель */
         .sidebar {
             width: 300px;
             background: white;
@@ -67,11 +59,6 @@
             cursor: pointer;
             font-size: 14px;
             width: 100%;
-            margin-top: 5px;
-        }
-        
-        .new-chat-btn:hover {
-            background: rgba(255,255,255,0.3);
         }
         
         .sessions-list {
@@ -104,16 +91,10 @@
             font-weight: 600;
             font-size: 14px;
             color: #333;
-            margin-bottom: 5px;
+            padding-right: 25px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            padding-right: 25px;
-        }
-        
-        .session-date {
-            font-size: 11px;
-            color: #999;
         }
         
         .delete-session {
@@ -125,18 +106,12 @@
             cursor: pointer;
             font-size: 14px;
             opacity: 0;
-            transition: opacity 0.2s;
         }
         
         .session-item:hover .delete-session {
             opacity: 1;
         }
         
-        .delete-session:hover {
-            color: #ff6b6b;
-        }
-        
-        /* Основной чат */
         .main-chat {
             flex: 1;
             background: white;
@@ -192,16 +167,14 @@
             color: white;
             padding: 12px 18px;
             border-radius: 18px;
-            border-bottom-right-radius: 4px;
         }
         
         .assistant .message-content {
             background: white;
             color: #333;
-            border-radius: 18px;
-            border-bottom-left-radius: 4px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             padding: 12px 18px;
+            border-radius: 18px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         
         .assistant {
@@ -227,13 +200,11 @@
             width: 100%;
         }
         
-        /* Стили для блоков кода */
         .code-block {
             margin: 12px 0;
             border-radius: 12px;
             overflow: hidden;
             background: #1e1e1e;
-            position: relative;
         }
         
         .code-header {
@@ -242,19 +213,11 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #3d3d3d;
         }
         
         .code-language {
             color: #9cdcfe;
             font-size: 12px;
-            font-family: monospace;
-            text-transform: uppercase;
-        }
-        
-        .code-actions {
-            display: flex;
-            gap: 8px;
         }
         
         .code-btn {
@@ -265,40 +228,22 @@
             border-radius: 6px;
             cursor: pointer;
             font-size: 11px;
-            transition: all 0.2s;
+            margin-left: 8px;
         }
         
         .code-btn:hover {
             background: #4d4d4d;
-            color: white;
-        }
-        
-        .code-btn.copied {
-            background: #4caf50;
-            color: white;
         }
         
         .code-content {
-            margin: 0;
             padding: 16px;
             overflow-x: auto;
         }
         
         .code-content pre {
             margin: 0;
-            font-family: 'Fira Code', 'Courier New', monospace;
+            font-family: monospace;
             font-size: 13px;
-            line-height: 1.5;
-        }
-        
-        .code-content code {
-            font-family: inherit;
-        }
-        
-        /* Подсветка кода от highlight.js */
-        .hljs {
-            background: #1e1e1e;
-            padding: 0;
         }
         
         .input-area {
@@ -315,7 +260,6 @@
             border: 2px solid #e0e0e0;
             border-radius: 25px;
             outline: none;
-            font-size: 14px;
         }
         
         input:focus {
@@ -330,16 +274,6 @@
             border-radius: 25px;
             cursor: pointer;
             font-weight: 600;
-            transition: transform 0.2s;
-        }
-        
-        button:hover:not(:disabled) {
-            transform: scale(1.02);
-        }
-        
-        button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
         }
         
         .typing {
@@ -361,11 +295,6 @@
             30% { transform: translateY(-10px); }
         }
         
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
         .status {
             background: #f0f0f0;
             padding: 8px;
@@ -381,9 +310,6 @@
             .sidebar {
                 width: 100%;
                 max-height: 200px;
-            }
-            .message-content {
-                max-width: 95%;
             }
         }
     </style>
@@ -404,7 +330,7 @@
             <div class="header">
                 <div class="logo">🎭</div>
                 <h1>ArtemGPT</h1>
-                <p id="sessionNameHeader">AI с характером | Поддержка кода</p>
+                <p id="sessionNameHeader">AI с характером</p>
             </div>
             
             <div class="chat-container" id="chatContainer">
@@ -412,9 +338,7 @@
                     <div class="message-wrapper">
                         <div class="avatar">🎭</div>
                         <div class="message-content">
-                            Привет! Я ArtemGPT — твой дружелюбный AI-помощник! 😊<br>
-                            Если я напишу код, ты сможешь его скопировать или скачать.<br>
-                            Спрашивай что угодно!
+                            Привет! Я ArtemGPT. Чем могу помочь? 😊
                         </div>
                     </div>
                 </div>
@@ -425,7 +349,7 @@
                 <button onclick="sendMessage()">Отправить</button>
             </div>
             <div class="status">
-                🟢 ArtemGPT онлайн | Поддержка кода: JavaScript, Python, HTML, CSS и др.
+                🟢 ArtemGPT онлайн
             </div>
         </div>
     </div>
@@ -434,150 +358,6 @@
         let currentSessionId = null;
         let isTyping = false;
         
-        // Функция для обнаружения и форматирования кода в тексте
-        function formatCodeBlocks(text) {
-            // Регулярка для поиска блоков кода с языком
-            const codeBlockRegex = /```(\w*)\n([\s\S]*?)```/g;
-            
-            let formattedText = text;
-            let match;
-            const codeBlocks = [];
-            
-            // Собираем все блоки кода
-            while ((match = codeBlockRegex.exec(text)) !== null) {
-                const language = match[1] || 'plaintext';
-                const code = match[2].trim();
-                codeBlocks.push({ language, code, fullMatch: match[0] });
-            }
-            
-            // Заменяем блоки кода на HTML
-            for (const block of codeBlocks) {
-                const encodedCode = escapeHtml(block.code);
-                const languageClass = block.language ? `language-${block.language}` : '';
-                
-                const codeHtml = `
-                    <div class="code-block">
-                        <div class="code-header">
-                            <span class="code-language">${block.language || 'text'}</span>
-                            <div class="code-actions">
-                                <button class="code-btn copy-btn" onclick="copyCode(this)">📋 Копировать</button>
-                                <button class="code-btn download-btn" onclick="downloadCode(this)">💾 Скачать</button>
-                            </div>
-                        </div>
-                        <div class="code-content">
-                            <pre><code class="${languageClass}">${encodedCode}</code></pre>
-                        </div>
-                    </div>
-                `;
-                formattedText = formattedText.replace(block.fullMatch, codeHtml);
-            }
-            
-            // Обрабатываем инлайн-код (в `backticks`)
-            formattedText = formattedText.replace(/`([^`]+)`/g, '<code style="background:#f0f0f0; padding:2px 6px; border-radius:4px; font-family:monospace;">$1</code>');
-            
-            return formattedText;
-        }
-        
-        // Копирование кода
-        function copyCode(btn) {
-            const codeBlock = btn.closest('.code-block');
-            const codeElement = codeBlock.querySelector('code');
-            const code = codeElement.textContent;
-            
-            navigator.clipboard.writeText(code).then(() => {
-                const originalText = btn.textContent;
-                btn.textContent = '✅ Скопировано!';
-                btn.classList.add('copied');
-                setTimeout(() => {
-                    btn.textContent = originalText;
-                    btn.classList.remove('copied');
-                }, 2000);
-            });
-        }
-        
-        // Скачивание кода
-        function downloadCode(btn) {
-            const codeBlock = btn.closest('.code-block');
-            const codeElement = codeBlock.querySelector('code');
-            const code = codeElement.textContent;
-            const languageSpan = codeBlock.querySelector('.code-language');
-            const language = languageSpan.textContent;
-            
-            // Определяем расширение файла
-            const extensions = {
-                'javascript': 'js',
-                'python': 'py',
-                'html': 'html',
-                'css': 'css',
-                'json': 'json',
-                'bash': 'sh',
-                'sql': 'sql',
-                'typescript': 'ts',
-                'plaintext': 'txt'
-            };
-            
-            const ext = extensions[language.toLowerCase()] || 'txt';
-            const filename = `artemgpt_code.${ext}`;
-            
-            const blob = new Blob([code], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            // Визуальная обратная связь
-            const originalText = btn.textContent;
-            btn.textContent = '💾 Скачано!';
-            setTimeout(() => {
-                btn.textContent = originalText;
-            }, 1500);
-        }
-        
-        // Обработка текста с подсветкой кода
-        function processMessageText(text) {
-            // Сначала форматируем блоки кода
-            let processed = formatCodeBlocks(text);
-            
-            // Обрабатываем переносы строк
-            processed = processed.replace(/\n/g, '<br>');
-            
-            return processed;
-        }
-        
-        function addMessage(text, sender) {
-            const container = document.getElementById('chatContainer');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${sender}`;
-            messageDiv.style.animation = 'fadeIn 0.3s ease';
-            
-            if (sender === 'assistant') {
-                const processedText = processMessageText(text);
-                messageDiv.innerHTML = `
-                    <div class="message-wrapper">
-                        <div class="avatar">🎭</div>
-                        <div class="message-content">${processedText}</div>
-                    </div>
-                `;
-                
-                // Подсвечиваем код после добавления в DOM
-                setTimeout(() => {
-                    messageDiv.querySelectorAll('pre code').forEach((block) => {
-                        hljs.highlightElement(block);
-                    });
-                }, 10);
-            } else {
-                messageDiv.innerHTML = `<div class="message-content">${escapeHtml(text)}</div>`;
-            }
-            
-            container.appendChild(messageDiv);
-            container.scrollTop = container.scrollHeight;
-        }
-        
-        // Остальные функции (sendMessage, loadSessions, и т.д.) остаются такими же
         async function sendMessage() {
             const input = document.getElementById('messageInput');
             const message = input.value.trim();
@@ -586,8 +366,7 @@
             
             addMessage(message, 'user');
             input.value = '';
-            
-            showTypingIndicator();
+            showTyping();
             isTyping = true;
             
             try {
@@ -598,180 +377,167 @@
                 });
                 
                 const data = await response.json();
-                removeTypingIndicator();
+                removeTyping();
                 
                 if (data.success) {
-                    await loadSessionMessages(data.session.id);
+                    addMessage(data.response, 'assistant');
+                    await loadSessions();
                 } else {
                     addMessage('❌ Ошибка: ' + data.error, 'assistant');
                 }
             } catch (error) {
-                removeTypingIndicator();
-                addMessage('❌ Ошибка подключения', 'assistant');
+                removeTyping();
+                addMessage('❌ Ошибка подключения к серверу', 'assistant');
+                console.error('Fetch error:', error);
             } finally {
                 isTyping = false;
             }
         }
         
-        async function loadSessions() {
-            try {
-                const response = await fetch('/api/sessions');
-                const data = await response.json();
-                
-                if (data.success) {
-                    const sessionsList = document.getElementById('sessionsList');
-                    
-                    if (data.sessions.length === 0) {
-                        sessionsList.innerHTML = '<div style="text-align: center; color: #999; padding: 20px;">Нет диалогов<br>Нажмите "+"</div>';
-                        return;
-                    }
-                    
-                    sessionsList.innerHTML = data.sessions.map(session => `
-                        <div class="session-item ${currentSessionId === session.id ? 'active' : ''}" onclick="switchSession('${session.id}')">
-                            <span class="delete-session" onclick="event.stopPropagation(); deleteSession('${session.id}')">🗑️</span>
-                            <div class="session-name">${escapeHtml(session.name)}</div>
-                            <div class="session-date">${new Date(session.updatedAt).toLocaleDateString()}</div>
-                        </div>
-                    `).join('');
-                }
-            } catch (error) {
-                console.error('Ошибка загрузки диалогов:', error);
-            }
-        }
-        
-        async function loadSessionMessages(sessionId) {
-            try {
-                const response = await fetch(`/api/sessions/${sessionId}`);
-                const data = await response.json();
-                
-                if (data.success) {
-                    const session = data.session;
-                    currentSessionId = session.id;
-                    document.getElementById('sessionNameHeader').textContent = session.name;
-                    
-                    const container = document.getElementById('chatContainer');
-                    container.innerHTML = '';
-                    
-                    if (session.messages.length === 0) {
-                        container.innerHTML = `
-                            <div class="message assistant">
-                                <div class="message-wrapper">
-                                    <div class="avatar">🎭</div>
-                                    <div class="message-content">Начни новый диалог! 😊</div>
-                                </div>
-                            </div>
-                        `;
-                    } else {
-                        for (const msg of session.messages) {
-                            addMessageToContainer(msg.content, msg.role);
-                        }
-                    }
-                    
-                    loadSessions();
-                }
-            } catch (error) {
-                console.error('Ошибка загрузки сообщений:', error);
-            }
-        }
-        
-        function addMessageToContainer(text, role) {
+        function addMessage(text, sender) {
             const container = document.getElementById('chatContainer');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${role}`;
-            messageDiv.style.animation = 'fadeIn 0.3s ease';
+            const div = document.createElement('div');
+            div.className = `message ${sender}`;
             
-            if (role === 'assistant') {
-                const processedText = processMessageText(text);
-                messageDiv.innerHTML = `
+            if (sender === 'assistant') {
+                const formatted = formatCode(text);
+                div.innerHTML = `
                     <div class="message-wrapper">
                         <div class="avatar">🎭</div>
-                        <div class="message-content">${processedText}</div>
+                        <div class="message-content">${formatted}</div>
                     </div>
                 `;
-                
-                setTimeout(() => {
-                    messageDiv.querySelectorAll('pre code').forEach((block) => {
-                        hljs.highlightElement(block);
-                    });
-                }, 10);
+                div.querySelectorAll('pre code').forEach(block => hljs.highlightElement(block));
             } else {
-                messageDiv.innerHTML = `<div class="message-content">${escapeHtml(text)}</div>`;
+                div.innerHTML = `<div class="message-content">${escapeHtml(text)}</div>`;
             }
             
-            container.appendChild(messageDiv);
+            container.appendChild(div);
             container.scrollTop = container.scrollHeight;
+        }
+        
+        function formatCode(text) {
+            return text.replace(/```(\w*)\n([\s\S]*?)```/g, (match, lang, code) => {
+                return `
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-language">${lang || 'text'}</span>
+                            <div>
+                                <button class="code-btn" onclick="copyCode(this)">📋 Копировать</button>
+                                <button class="code-btn" onclick="downloadCode(this)">💾 Скачать</button>
+                            </div>
+                        </div>
+                        <div class="code-content">
+                            <pre><code class="language-${lang}">${escapeHtml(code.trim())}</code></pre>
+                        </div>
+                    </div>
+                `;
+            }).replace(/\n/g, '<br>');
+        }
+        
+        function copyCode(btn) {
+            const code = btn.closest('.code-block').querySelector('code').textContent;
+            navigator.clipboard.writeText(code);
+            btn.textContent = '✅';
+            setTimeout(() => btn.textContent = '📋 Копировать', 1500);
+        }
+        
+        function downloadCode(btn) {
+            const code = btn.closest('.code-block').querySelector('code').textContent;
+            const blob = new Blob([code], { type: 'text/plain' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'code.txt';
+            a.click();
+            URL.revokeObjectURL(a.href);
+        }
+        
+        async function loadSessions() {
+            try {
+                const res = await fetch('/api/sessions');
+                const data = await res.json();
+                const list = document.getElementById('sessionsList');
+                
+                if (data.sessions?.length) {
+                    list.innerHTML = data.sessions.map(s => `
+                        <div class="session-item ${currentSessionId === s.id ? 'active' : ''}" onclick="switchSession('${s.id}')">
+                            <span class="delete-session" onclick="event.stopPropagation(); deleteSession('${s.id}')">🗑️</span>
+                            <div class="session-name">${escapeHtml(s.name)}</div>
+                        </div>
+                    `).join('');
+                } else {
+                    list.innerHTML = '<div style="text-align:center;color:#999;padding:20px;">Нет диалогов</div>';
+                }
+            } catch(e) { console.error(e); }
+        }
+        
+        async function switchSession(id) {
+            await fetch(`/api/sessions/${id}/switch`, { method: 'POST' });
+            currentSessionId = id;
+            loadSessionMessages(id);
+            loadSessions();
+        }
+        
+        async function loadSessionMessages(id) {
+            try {
+                const res = await fetch(`/api/sessions/${id}`);
+                const data = await res.json();
+                if (data.session) {
+                    const container = document.getElementById('chatContainer');
+                    container.innerHTML = '';
+                    data.session.messages.forEach(msg => {
+                        addMessage(msg.content, msg.role);
+                    });
+                    document.getElementById('sessionNameHeader').textContent = data.session.name;
+                    currentSessionId = data.session.id;
+                }
+            } catch(e) { console.error(e); }
         }
         
         async function createNewChat() {
-            try {
-                const response = await fetch('/api/sessions', { method: 'POST' });
-                const data = await response.json();
-                if (data.success) {
-                    await loadSessionMessages(data.session.id);
-                }
-            } catch (error) {
-                console.error('Ошибка создания диалога:', error);
+            const res = await fetch('/api/sessions', { method: 'POST' });
+            const data = await res.json();
+            if (data.session) {
+                await loadSessionMessages(data.session.id);
+                loadSessions();
             }
         }
         
-        async function switchSession(sessionId) {
-            try {
-                const response = await fetch(`/api/sessions/${sessionId}/switch`, { method: 'POST' });
-                const data = await response.json();
-                if (data.success) {
-                    await loadSessionMessages(sessionId);
-                }
-            } catch (error) {
-                console.error('Ошибка переключения:', error);
+        async function deleteSession(id) {
+            if (!confirm('Удалить диалог?')) return;
+            await fetch(`/api/sessions/${id}`, { method: 'DELETE' });
+            const res = await fetch('/api/sessions');
+            const data = await res.json();
+            if (data.sessions.length) {
+                await loadSessionMessages(data.sessions[0].id);
+            } else {
+                await createNewChat();
             }
+            loadSessions();
         }
         
-        async function deleteSession(sessionId) {
-            if (confirm('Удалить этот диалог?')) {
-                try {
-                    await fetch(`/api/sessions/${sessionId}`, { method: 'DELETE' });
-                    await loadSessions();
-                    
-                    const response = await fetch('/api/sessions');
-                    const data = await response.json();
-                    if (data.sessions.length > 0) {
-                        await loadSessionMessages(data.sessions[0].id);
-                    } else {
-                        await createNewChat();
-                    }
-                } catch (error) {
-                    console.error('Ошибка удаления:', error);
-                }
-            }
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') sendMessage();
         }
         
-        function handleKeyPress(event) {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                sendMessage();
-            }
-        }
-        
-        function showTypingIndicator() {
+        function showTyping() {
             const container = document.getElementById('chatContainer');
-            const indicator = document.createElement('div');
-            indicator.className = 'message assistant';
-            indicator.id = 'typingIndicator';
-            indicator.innerHTML = `
+            const div = document.createElement('div');
+            div.className = 'message assistant';
+            div.id = 'typingIndicator';
+            div.innerHTML = `
                 <div class="message-wrapper">
                     <div class="avatar">🎭</div>
-                    <div class="message-content">
-                        <div class="typing"><span></span><span></span><span></span></div>
-                    </div>
+                    <div class="message-content"><div class="typing"><span></span><span></span><span></span></div></div>
                 </div>
             `;
-            container.appendChild(indicator);
+            container.appendChild(div);
             container.scrollTop = container.scrollHeight;
         }
         
-        function removeTypingIndicator() {
-            const indicator = document.getElementById('typingIndicator');
-            if (indicator) indicator.remove();
+        function removeTyping() {
+            const el = document.getElementById('typingIndicator');
+            if (el) el.remove();
         }
         
         function escapeHtml(text) {
@@ -780,18 +546,15 @@
             return div.innerHTML;
         }
         
-        // Инициализация
-        async function init() {
-            const response = await fetch('/api/sessions');
-            const data = await response.json();
-            if (data.sessions.length > 0) {
-                await loadSessionMessages(data.sessions[0].id);
+        // Загрузка первой сессии
+        fetch('/api/sessions').then(res => res.json()).then(data => {
+            if (data.sessions?.length) {
+                loadSessionMessages(data.sessions[0].id);
             } else {
-                await createNewChat();
+                createNewChat();
             }
-        }
-        
-        init();
+            loadSessions();
+        });
     </script>
 </body>
 </html>
