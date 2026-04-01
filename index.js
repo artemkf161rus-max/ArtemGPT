@@ -13,7 +13,8 @@ const PORT = process.env.PORT || 3000;
 // OpenRouter API
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 const API_KEY = process.env.OPENROUTER_API_KEY;
-const MODEL_NAME = 'deepseek/deepseek-r1-0528:free'; // Бесплатная модель
+// РАБОЧАЯ БЕСПЛАТНАЯ МОДЕЛЬ
+const MODEL_NAME = 'meta-llama/llama-3.3-70b-instruct:free';
 
 app.use(cors());
 app.use(express.json());
@@ -93,7 +94,7 @@ async function queryArtemGPT(prompt, history = []) {
         { role: 'user', content: prompt }
     ];
     
-    console.log(`🔄 Запрос: "${prompt.substring(0, 50)}..."`);
+    console.log(`🔄 Запрос к Llama 3.3 70B: "${prompt.substring(0, 50)}..."`);
     const startTime = Date.now();
     
     try {
@@ -116,7 +117,7 @@ async function queryArtemGPT(prompt, history = []) {
         
         if (!response.ok) {
             const errorText = await response.text();
-            throw new Error(`API ошибка (${response.status}): ${errorText.substring(0, 200)}`);
+            throw new Error(`API ошибка (${response.status}): ${errorText}`);
         }
         
         const data = await response.json();
@@ -227,7 +228,7 @@ if (sessions.length === 0) createNewSession();
 else currentSessionId = sessions[0].id;
 
 app.listen(PORT, () => {
-    console.log(`\n🎭 ARTEMGPT - OPENROUTER ВЕРСИЯ`);
+    console.log(`\n🎭 ARTEMGPT - OPENROUTER VERSION`);
     console.log(`═══════════════════════════════════`);
     console.log(`🚀 Сервер: http://localhost:${PORT}`);
     console.log(`🤖 Модель: ${MODEL_NAME} (бесплатно)`);
