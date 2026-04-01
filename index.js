@@ -14,7 +14,7 @@ const PORT = process.env.PORT || 3000;
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 const API_KEY = process.env.OPENROUTER_API_KEY;
 // РАБОЧАЯ БЕСПЛАТНАЯ МОДЕЛЬ
-const MODEL_NAME = 'microsoft/phi-4:free';
+const MODEL_NAME = 'nvidia/nemotron-3-super-120b:free';
 
 app.use(cors());
 app.use(express.json());
