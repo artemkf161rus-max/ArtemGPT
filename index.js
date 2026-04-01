@@ -13,8 +13,9 @@ const PORT = process.env.PORT || 3000;
 // OpenRouter API
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 const API_KEY = process.env.OPENROUTER_API_KEY;
-// РАБОЧАЯ БЕСПЛАТНАЯ МОДЕЛЬ
-const MODEL_NAME = 'nvidia/nemotron-3-super-120b:free';
+
+// ✅ ПРАВИЛЬНАЯ МОДЕЛЬ — РАБОТАЕТ
+const MODEL_NAME = 'nvidia/nemotron-3-super-120b-a12b-20230311:free';
 
 app.use(cors());
 app.use(express.json());
@@ -85,7 +86,7 @@ const SYSTEM_PROMPT = `Ты - ArtemGPT. Это твоя полная идент�
 
 async function queryArtemGPT(prompt, history = []) {
     if (!API_KEY) {
-        throw new Error('OPENROUTER_API_KEY не установлен');
+        throw new Error('OPENROUTER_API_KEY не установлен. Добавь его в .env файл');
     }
     
     const messages = [
@@ -94,7 +95,7 @@ async function queryArtemGPT(prompt, history = []) {
         { role: 'user', content: prompt }
     ];
     
-    console.log(`🔄 Запрос к Llama 3.3 70B: "${prompt.substring(0, 50)}..."`);
+    console.log(`🔄 Запрос: "${prompt.substring(0, 50)}..."`);
     const startTime = Date.now();
     
     try {
@@ -126,7 +127,6 @@ async function queryArtemGPT(prompt, history = []) {
         
         let reply = data.choices?.[0]?.message?.content || '';
         
-        // Пост-обработка
         if (history.length > 0 && reply.match(/^Привет[!,\s]/i)) {
             reply = reply.replace(/^Привет[!,\s]*/i, '').trim();
         }
@@ -228,10 +228,10 @@ if (sessions.length === 0) createNewSession();
 else currentSessionId = sessions[0].id;
 
 app.listen(PORT, () => {
-    console.log(`\n🎭 ARTEMGPT - OPENROUTER VERSION`);
+    console.log(`\n🎭 ARTEMGPT - РАБОЧАЯ ВЕРСИЯ`);
     console.log(`═══════════════════════════════════`);
     console.log(`🚀 Сервер: http://localhost:${PORT}`);
-    console.log(`🤖 Модель: ${MODEL_NAME} (бесплатно)`);
+    console.log(`🤖 Модель: Nemotron 3 Super (бесплатно)`);
     console.log(`🔑 API ключ: ${API_KEY ? '✅ настроен' : '❌ не настроен'}`);
     console.log(`\n💬 Чат: http://localhost:${PORT}\n`);
 });
