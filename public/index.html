@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArtemGPT - AI с характером</title>
+    <!-- Подключаем Highlight.js для подсветки кода -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/html.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .app {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            gap: 20px;
+            height: 90vh;
+        }
+        
+        /* Боковая панель */
+        .sidebar {
+            width: 300px;
+            background: white;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .sidebar-header h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .new-chat-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            width: 100%;
+            margin-top: 5px;
+        }
+        
+        .new-chat-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .sessions-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        
+        .session-item {
+            padding: 12px;
+            margin-bottom: 8px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+            position: relative;
+        }
+        
+        .session-item:hover {
+            background: #e9ecef;
+        }
+        
+        .session-item.active {
+            background: linear-gradient(135deg, #667eea20 0%, #764ba220 100%);
+            border-left-color: #667eea;
+        }
+        
+        .session-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 5px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            padding-right: 25px;
+        }
+        
+        .session-date {
+            font-size: 11px;
+            color: #999;
+        }
+        
+        .delete-session {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            cursor: pointer;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .session-item:hover .delete-session {
+            opacity: 1;
+        }
+        
+        .delete-session:hover {
+            color: #ff6b6b;
+        }
+        
+        /* Основной чат */
+        .main-chat {
+            flex: 1;
+            background: white;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .logo {
+            font-size: 48px;
+            animation: bounce 1s ease infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .message.user {
+            justify-content: flex-end;
+        }
+        
+        .message-content {
+            max-width: 85%;
+            word-wrap: break-word;
+            line-height: 1.5;
+        }
+        
+        .user .message-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 18px;
+            border-radius: 18px;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .assistant .message-content {
+            background: white;
+            color: #333;
+            border-radius: 18px;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 12px 18px;
+        }
+        
+        .assistant {
+            gap: 10px;
+        }
+        
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        
+        .message-wrapper {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            width: 100%;
+        }
+        
+        /* Стили для блоков кода */
+        .code-block {
+            margin: 12px 0;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #1e1e1e;
+            position: relative;
+        }
+        
+        .code-header {
+            background: #2d2d2d;
+            padding: 8px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #3d3d3d;
+        }
+        
+        .code-language {
+            color: #9cdcfe;
+            font-size: 12px;
+            font-family: monospace;
+            text-transform: uppercase;
+        }
+        
+        .code-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .code-btn {
+            background: #3d3d3d;
+            border: none;
+            color: #ccc;
+            padding: 4px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.2s;
+        }
+        
+        .code-btn:hover {
+            background: #4d4d4d;
+            color: white;
+        }
+        
+        .code-btn.copied {
+            background: #4caf50;
+            color: white;
+        }
+        
+        .code-content {
+            margin: 0;
+            padding: 16px;
+            overflow-x: auto;
+        }
+        
+        .code-content pre {
+            margin: 0;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        
+        .code-content code {
+            font-family: inherit;
+        }
+        
+        /* Подсветка кода от highlight.js */
+        .hljs {
+            background: #1e1e1e;
+            padding: 0;
+        }
+        
+        .input-area {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 10px;
+        }
+        
+        input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            outline: none;
+            font-size: 14px;
+        }
+        
+        input:focus {
+            border-color: #667eea;
+        }
+        
+        button {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+        
+        button:hover:not(:disabled) {
+            transform: scale(1.02);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .typing {
+            display: flex;
+            gap: 4px;
+            padding: 12px 18px;
+        }
+        
+        .typing span {
+            width: 8px;
+            height: 8px;
+            background: #999;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+        
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .status {
+            background: #f0f0f0;
+            padding: 8px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        @media (max-width: 768px) {
+            .app {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                max-height: 200px;
+            }
+            .message-content {
+                max-width: 95%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h3>📋 Диалоги</h3>
+                <button class="new-chat-btn" onclick="createNewChat()">➕ Новый диалог</button>
+            </div>
+            <div class="sessions-list" id="sessionsList">
+                <div style="text-align: center; color: #999; padding: 20px;">Загрузка...</div>
+            </div>
+        </div>
+        
+        <div class="main-chat">
+            <div class="header">
+                <div class="logo">🎭</div>
+                <h1>ArtemGPT</h1>
+                <p id="sessionNameHeader">AI с характером | Поддержка кода</p>
+            </div>
+            
+            <div class="chat-container" id="chatContainer">
+                <div class="message assistant">
+                    <div class="message-wrapper">
+                        <div class="avatar">🎭</div>
+                        <div class="message-content">
+                            Привет! Я ArtemGPT — твой дружелюбный AI-помощник! 😊<br>
+                            Если я напишу код, ты сможешь его скопировать или скачать.<br>
+                            Спрашивай что угодно!
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="input-area">
+                <input type="text" id="messageInput" placeholder="Спроси ArtemGPT..." onkeypress="handleKeyPress(event)" autofocus>
+                <button onclick="sendMessage()">Отправить</button>
+            </div>
+            <div class="status">
+                🟢 ArtemGPT онлайн | Поддержка кода: JavaScript, Python, HTML, CSS и др.
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentSessionId = null;
+        let isTyping = false;
+        
+        // Функция для обнаружения и форматирования кода в тексте
+        function formatCodeBlocks(text) {
+            // Регулярка для поиска блоков кода с языком
+            const codeBlockRegex = /```(\w*)\n([\s\S]*?)```/g;
+            
+            let formattedText = text;
+            let match;
+            const codeBlocks = [];
+            
+            // Собираем все блоки кода
+            while ((match = codeBlockRegex.exec(text)) !== null) {
+                const language = match[1] || 'plaintext';
+                const code = match[2].trim();
+                codeBlocks.push({ language, code, fullMatch: match[0] });
+            }
+            
+            // Заменяем блоки кода на HTML
+            for (const block of codeBlocks) {
+                const encodedCode = escapeHtml(block.code);
+                const languageClass = block.language ? `language-${block.language}` : '';
+                
+                const codeHtml = `
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="code-language">${block.language || 'text'}</span>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn" onclick="copyCode(this)">📋 Копировать</button>
+                                <button class="code-btn download-btn" onclick="downloadCode(this)">💾 Скачать</button>
+                            </div>
+                        </div>
+                        <div class="code-content">
+                            <pre><code class="${languageClass}">${encodedCode}</code></pre>
+                        </div>
+                    </div>
+                `;
+                formattedText = formattedText.replace(block.fullMatch, codeHtml);
+            }
+            
+            // Обрабатываем инлайн-код (в `backticks`)
+            formattedText = formattedText.replace(/`([^`]+)`/g, '<code style="background:#f0f0f0; padding:2px 6px; border-radius:4px; font-family:monospace;">$1</code>');
+            
+            return formattedText;
+        }
+        
+        // Копирование кода
+        function copyCode(btn) {
+            const codeBlock = btn.closest('.code-block');
+            const codeElement = codeBlock.querySelector('code');
+            const code = codeElement.textContent;
+            
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = btn.textContent;
+                btn.textContent = '✅ Скопировано!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+        
+        // Скачивание кода
+        function downloadCode(btn) {
+            const codeBlock = btn.closest('.code-block');
+            const codeElement = codeBlock.querySelector('code');
+            const code = codeElement.textContent;
+            const languageSpan = codeBlock.querySelector('.code-language');
+            const language = languageSpan.textContent;
+            
+            // Определяем расширение файла
+            const extensions = {
+                'javascript': 'js',
+                'python': 'py',
+                'html': 'html',
+                'css': 'css',
+                'json': 'json',
+                'bash': 'sh',
+                'sql': 'sql',
+                'typescript': 'ts',
+                'plaintext': 'txt'
+            };
+            
+            const ext = extensions[language.toLowerCase()] || 'txt';
+            const filename = `artemgpt_code.${ext}`;
+            
+            const blob = new Blob([code], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            // Визуальная обратная связь
+            const originalText = btn.textContent;
+            btn.textContent = '💾 Скачано!';
+            setTimeout(() => {
+                btn.textContent = originalText;
+            }, 1500);
+        }
+        
+        // Обработка текста с подсветкой кода
+        function processMessageText(text) {
+            // Сначала форматируем блоки кода
+            let processed = formatCodeBlocks(text);
+            
+            // Обрабатываем переносы строк
+            processed = processed.replace(/\n/g, '<br>');
+            
+            return processed;
+        }
+        
+        function addMessage(text, sender) {
+            const container = document.getElementById('chatContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            messageDiv.style.animation = 'fadeIn 0.3s ease';
+            
+            if (sender === 'assistant') {
+                const processedText = processMessageText(text);
+                messageDiv.innerHTML = `
+                    <div class="message-wrapper">
+                        <div class="avatar">🎭</div>
+                        <div class="message-content">${processedText}</div>
+                    </div>
+                `;
+                
+                // Подсвечиваем код после добавления в DOM
+                setTimeout(() => {
+                    messageDiv.querySelectorAll('pre code').forEach((block) => {
+                        hljs.highlightElement(block);
+                    });
+                }, 10);
+            } else {
+                messageDiv.innerHTML = `<div class="message-content">${escapeHtml(text)}</div>`;
+            }
+            
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        // Остальные функции (sendMessage, loadSessions, и т.д.) остаются такими же
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (!message || isTyping) return;
+            
+            addMessage(message, 'user');
+            input.value = '';
+            
+            showTypingIndicator();
+            isTyping = true;
+            
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message, sessionId: currentSessionId })
+                });
+                
+                const data = await response.json();
+                removeTypingIndicator();
+                
+                if (data.success) {
+                    await loadSessionMessages(data.session.id);
+                } else {
+                    addMessage('❌ Ошибка: ' + data.error, 'assistant');
+                }
+            } catch (error) {
+                removeTypingIndicator();
+                addMessage('❌ Ошибка подключения', 'assistant');
+            } finally {
+                isTyping = false;
+            }
+        }
+        
+        async function loadSessions() {
+            try {
+                const response = await fetch('/api/sessions');
+                const data = await response.json();
+                
+                if (data.success) {
+                    const sessionsList = document.getElementById('sessionsList');
+                    
+                    if (data.sessions.length === 0) {
+                        sessionsList.innerHTML = '<div style="text-align: center; color: #999; padding: 20px;">Нет диалогов<br>Нажмите "+"</div>';
+                        return;
+                    }
+                    
+                    sessionsList.innerHTML = data.sessions.map(session => `
+                        <div class="session-item ${currentSessionId === session.id ? 'active' : ''}" onclick="switchSession('${session.id}')">
+                            <span class="delete-session" onclick="event.stopPropagation(); deleteSession('${session.id}')">🗑️</span>
+                            <div class="session-name">${escapeHtml(session.name)}</div>
+                            <div class="session-date">${new Date(session.updatedAt).toLocaleDateString()}</div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки диалогов:', error);
+            }
+        }
+        
+        async function loadSessionMessages(sessionId) {
+            try {
+                const response = await fetch(`/api/sessions/${sessionId}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    const session = data.session;
+                    currentSessionId = session.id;
+                    document.getElementById('sessionNameHeader').textContent = session.name;
+                    
+                    const container = document.getElementById('chatContainer');
+                    container.innerHTML = '';
+                    
+                    if (session.messages.length === 0) {
+                        container.innerHTML = `
+                            <div class="message assistant">
+                                <div class="message-wrapper">
+                                    <div class="avatar">🎭</div>
+                                    <div class="message-content">Начни новый диалог! 😊</div>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        for (const msg of session.messages) {
+                            addMessageToContainer(msg.content, msg.role);
+                        }
+                    }
+                    
+                    loadSessions();
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки сообщений:', error);
+            }
+        }
+        
+        function addMessageToContainer(text, role) {
+            const container = document.getElementById('chatContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role}`;
+            messageDiv.style.animation = 'fadeIn 0.3s ease';
+            
+            if (role === 'assistant') {
+                const processedText = processMessageText(text);
+                messageDiv.innerHTML = `
+                    <div class="message-wrapper">
+                        <div class="avatar">🎭</div>
+                        <div class="message-content">${processedText}</div>
+                    </div>
+                `;
+                
+                setTimeout(() => {
+                    messageDiv.querySelectorAll('pre code').forEach((block) => {
+                        hljs.highlightElement(block);
+                    });
+                }, 10);
+            } else {
+                messageDiv.innerHTML = `<div class="message-content">${escapeHtml(text)}</div>`;
+            }
+            
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        async function createNewChat() {
+            try {
+                const response = await fetch('/api/sessions', { method: 'POST' });
+                const data = await response.json();
+                if (data.success) {
+                    await loadSessionMessages(data.session.id);
+                }
+            } catch (error) {
+                console.error('Ошибка создания диалога:', error);
+            }
+        }
+        
+        async function switchSession(sessionId) {
+            try {
+                const response = await fetch(`/api/sessions/${sessionId}/switch`, { method: 'POST' });
+                const data = await response.json();
+                if (data.success) {
+                    await loadSessionMessages(sessionId);
+                }
+            } catch (error) {
+                console.error('Ошибка переключения:', error);
+            }
+        }
+        
+        async function deleteSession(sessionId) {
+            if (confirm('Удалить этот диалог?')) {
+                try {
+                    await fetch(`/api/sessions/${sessionId}`, { method: 'DELETE' });
+                    await loadSessions();
+                    
+                    const response = await fetch('/api/sessions');
+                    const data = await response.json();
+                    if (data.sessions.length > 0) {
+                        await loadSessionMessages(data.sessions[0].id);
+                    } else {
+                        await createNewChat();
+                    }
+                } catch (error) {
+                    console.error('Ошибка удаления:', error);
+                }
+            }
+        }
+        
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+        
+        function showTypingIndicator() {
+            const container = document.getElementById('chatContainer');
+            const indicator = document.createElement('div');
+            indicator.className = 'message assistant';
+            indicator.id = 'typingIndicator';
+            indicator.innerHTML = `
+                <div class="message-wrapper">
+                    <div class="avatar">🎭</div>
+                    <div class="message-content">
+                        <div class="typing"><span></span><span></span><span></span></div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(indicator);
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        function removeTypingIndicator() {
+            const indicator = document.getElementById('typingIndicator');
+            if (indicator) indicator.remove();
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Инициализация
+        async function init() {
+            const response = await fetch('/api/sessions');
+            const data = await response.json();
+            if (data.sessions.length > 0) {
+                await loadSessionMessages(data.sessions[0].id);
+            } else {
+                await createNewChat();
+            }
+        }
+        
+        init();
+    </script>
+</body>
+</html>

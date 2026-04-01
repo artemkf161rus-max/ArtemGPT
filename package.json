@@ -1,0 +1,26 @@
+{
+  "name": "ai-assistant",
+  "version": "1.0.0",
+  "description": "AI Assistant with DeepSeek v3.1 via Ollama",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node index.js",
+    "interactive": "node index.js --interactive",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "ai",
+    "ollama",
+    "deepseek",
+    "assistant"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "node-fetch": "^2.7.0"
+  }
+}

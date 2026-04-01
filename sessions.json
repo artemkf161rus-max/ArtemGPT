@@ -1,0 +1,32 @@
+{
+  "sessions": [
+    {
+      "id": "1775064601837",
+      "name": "привет напиши какой то код",
+      "messages": [
+        {
+          "role": "user",
+          "content": "привет напиши какой то код",
+          "timestamp": "2026-04-01T17:30:24.075Z"
+        },
+        {
+          "role": "assistant",
+          "content": "Привет! Я ArtemGPT 😊\n\nВот простой Python‑скрипт, который считает сумму чисел от 1 до n:\n\n```python\ndef sum_to_n(n):\n    return n * (n + 1) // 2\n\nn = 10\nprint(f\"Сумма 1..{n} = {sum_to_n(n)}\")\n```",
+          "timestamp": "2026-04-01T17:30:24.075Z"
+        },
+        {
+          "role": "user",
+          "content": "напиши на си шарп",
+          "timestamp": "2026-04-01T17:30:35.391Z"
+        },
+        {
+          "role": "assistant",
+          "content": "Вот простой C#‑пример, который считает сумму чисел от 1 до n:\n\n```csharp\nusing System;\n\nclass Program\n{\n    static int SumToN(int n) => n * (n + 1) / 2;\n\n    static void Main()\n    {\n        int n = 10;\n        Console.WriteLine($\"Сумма 1..{n} = {SumToN(n)}\");\n    }\n}\n```",
+          "timestamp": "2026-04-01T17:30:35.391Z"
+        }
+      ],
+      "createdAt": "2026-04-01T17:30:01.837Z",
+      "updatedAt": "2026-04-01T17:30:35.391Z"
+    }
+  ]
+}
