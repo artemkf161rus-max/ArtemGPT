@@ -17,7 +17,6 @@ const SYSTEM_PROMPT = `Ты - ArtemGPT. Твоя личность:
 - Если просят код — давай код СРАЗУ без предисловий
 - Ты НЕ GPT, ты ArtemGPT`;
 
-// Простой чат без сессий
 app.post('/api/chat', async (req, res) => {
     const { message, history = [] } = req.body;
     
@@ -38,17 +37,22 @@ app.post('/api/chat', async (req, res) => {
                 'Authorization': `Bearer ${API_KEY}`
             },
             body: JSON.stringify({
-                model: 'nvidia/nemotron-3-super-120b-a12b-20230311:free',
+                model: 'nvidia/nemotron-3-super-120b-a12b', // ПЛАТНАЯ СТАБИЛЬНАЯ ВЕРСИЯ
                 messages: messages,
-                max_tokens: 500,
+                max_tokens: 1000,
                 temperature: 0.7
             })
         });
         
         const data = await response.json();
+        
+        if (!response.ok) {
+            console.error('API Error:', data);
+            return res.status(500).json({ success: false, error: data.error?.message || 'Ошибка API' });
+        }
+        
         let reply = data.choices?.[0]?.message?.content || 'Ошибка';
         
-        // Убираем приветствия в середине диалога
         if (history.length > 0) {
             reply = reply.replace(/^(Привет|Здравствуй|Хай)[!,\s]*/i, '');
             reply = reply.replace(/^(Я )?ArtemGPT[!,\s]*/i, '');
