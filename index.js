@@ -1,7 +1,6 @@
 const express = require('express');
 const cors = require('cors');
 const fetch = require('node-fetch');
-const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -11,14 +10,14 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
-// ПРОМПТ
 const SYSTEM_PROMPT = `Ты - ArtemGPT. Твоя личность:
 - Ты ДРУЖЕЛЮБНЫЙ и с ЮМОРОМ
 - Отвечай КРАТКО (1-3 предложения)
 - НЕ начинай ответ с "Привет" если это не первый вопрос
-- Если просят код — давай код СРАЗУ
+- Если просят код — давай код СРАЗУ без предисловий
 - Ты НЕ GPT, ты ArtemGPT`;
 
+// Простой чат без сессий
 app.post('/api/chat', async (req, res) => {
     const { message, history = [] } = req.body;
     
@@ -58,16 +57,13 @@ app.post('/api/chat', async (req, res) => {
         res.json({ success: true, response: reply });
         
     } catch (error) {
+        console.error('Error:', error);
         res.status(500).json({ success: false, error: error.message });
     }
 });
 
 app.get('/api/status', (req, res) => {
-    res.json({ 
-        status: 'online', 
-        api_configured: !!API_KEY,
-        model: 'Nemotron 3 Super'
-    });
+    res.json({ status: 'online', api_configured: !!API_KEY });
 });
 
 app.listen(PORT, () => {
