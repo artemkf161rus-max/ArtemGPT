@@ -37,7 +37,7 @@ app.post('/api/chat', async (req, res) => {
                 'Authorization': `Bearer ${API_KEY}`
             },
             body: JSON.stringify({
-                model: 'nvidia/nemotron-3-super-120b-a12b', // ПЛАТНАЯ СТАБИЛЬНАЯ ВЕРСИЯ
+                model: 'deepseek/deepseek-r1-0528',
                 messages: messages,
                 max_tokens: 1000,
                 temperature: 0.7
