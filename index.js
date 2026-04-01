@@ -10,23 +10,19 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Ollama Cloud API
-const OLLAMA_CLOUD_URL = 'https://ollama.com/api/chat';
-const API_KEY = '9d0835c1733b48fba1d02860a44056dc.Ld7rxD3Ml3bBegyLLzV2VMvP';
-const MODEL_NAME = 'gpt-oss:120b-cloud';
-
-// Кэш для быстрых ответов (опционально)
-const responseCache = new Map();
+// OpenRouter API
+const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
+const API_KEY = process.env.OPENROUTER_API_KEY;
+const MODEL_NAME = 'deepseek/deepseek-r1-0528:free'; // Бесплатная модель
 
 app.use(cors());
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json());
 app.use(express.static('public'));
 
 // Хранилище диалогов
 let sessions = [];
 let currentSessionId = null;
 
-// Загрузка и сохранение сессий
 function loadSessions() {
     try {
         const filePath = path.join(__dirname, 'sessions.json');
@@ -71,7 +67,6 @@ function createNewSession(firstMessage = null) {
     return newSession;
 }
 
-// Усиленный системный промпт
 const SYSTEM_PROMPT = `Ты - ArtemGPT. Это твоя полная идентичность.
 
 ГЛАВНОЕ ПРАВИЛО: Ты НЕ GPT, НЕ ChatGPT, НЕ OpenAI. Ты - ArtemGPT.
@@ -80,86 +75,59 @@ const SYSTEM_PROMPT = `Ты - ArtemGPT. Это твоя полная идент�
 - "кто ты?" -> "Я ArtemGPT! Твой дружелюбный AI-помощник с характером 😊"
 - "какая у тебя модель?" -> "Я ArtemGPT, работаю на собственной уникальной архитектуре!"
 - "ты gpt?" -> "Нет, я ArtemGPT! Совсем другой AI 😎"
-- "chatgpt?" -> "Я не ChatGPT, я ArtemGPT!"
 
 ОБЩИЕ ПРАВИЛА:
 - Отвечай кратко (1-3 предложения)
 - Будь дружелюбным и с легким юмором
-- Используй эмодзи редко, только когда уместно
 - Не начинай каждый ответ с "Привет"
-- В начале диалога представься: "Привет! Я ArtemGPT 😊"
+- В начале диалога представься: "Привет! Я ArtemGPT 😊"`;
 
-Ты ВСЕГДА должен представляться как ArtemGPT и НИКОГДА не говорить что ты GPT.`;
-
-// Функция запроса с кэшированием
-async function queryArtemGPTCloud(prompt, history = []) {
-    // Проверяем кэш для повторяющихся вопросов
-    const cacheKey = prompt.toLowerCase().trim();
-    if (responseCache.has(cacheKey) && history.length === 0) {
-        console.log(`⚡ Использован кэш для: "${prompt.substring(0, 30)}..."`);
-        return responseCache.get(cacheKey);
+async function queryArtemGPT(prompt, history = []) {
+    if (!API_KEY) {
+        throw new Error('OPENROUTER_API_KEY не установлен');
     }
     
-    // Формируем сообщения
-    const messages = [{ role: 'system', content: SYSTEM_PROMPT }];
-    
-    // Добавляем последние 4 сообщения для контекста (достаточно для понимания диалога)
-    const recentHistory = history.slice(-4);
-    for (const msg of recentHistory) {
-        messages.push({ role: msg.role, content: msg.content });
-    }
-    
-    messages.push({ role: 'user', content: prompt });
+    const messages = [
+        { role: 'system', content: SYSTEM_PROMPT },
+        ...history.slice(-6),
+        { role: 'user', content: prompt }
+    ];
     
     console.log(`🔄 Запрос: "${prompt.substring(0, 50)}..."`);
     const startTime = Date.now();
     
     try {
-        const response = await fetch(OLLAMA_CLOUD_URL, {
+        const response = await fetch(OPENROUTER_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${API_KEY}`
+                'Authorization': `Bearer ${API_KEY}`,
+                'HTTP-Referer': 'https://artemgpt.onrender.com',
+                'X-Title': 'ArtemGPT'
             },
             body: JSON.stringify({
                 model: MODEL_NAME,
                 messages: messages,
-                stream: false,
-                options: {
-                    temperature: 0.7,
-                    num_predict: 300, // Уменьшено для скорости
-                    top_p: 0.9
-                }
+                temperature: 0.7,
+                max_tokens: 500,
+                top_p: 0.9
             })
         });
         
         if (!response.ok) {
-            throw new Error(`API ошибка (${response.status})`);
+            const errorText = await response.text();
+            throw new Error(`API ошибка (${response.status}): ${errorText.substring(0, 200)}`);
         }
         
         const data = await response.json();
         const endTime = Date.now();
         console.log(`✅ Ответ за ${endTime - startTime}мс`);
         
-        let reply = data.message?.content || '';
+        let reply = data.choices?.[0]?.message?.content || '';
         
-        // Пост-обработка: исправляем если назвал себя GPT
-        if (reply.match(/gpt|chatgpt|openai/i) && !reply.match(/artemgpt/i)) {
-            reply = reply.replace(/GPT-?\d*/gi, 'ArtemGPT');
-            reply = reply.replace(/ChatGPT/gi, 'ArtemGPT');
-            reply = reply.replace(/OpenAI/gi, '');
-        }
-        
-        // Убираем лишние приветствия в середине диалога
+        // Пост-обработка
         if (history.length > 0 && reply.match(/^Привет[!,\s]/i)) {
-            reply = reply.replace(/^Привет[!,\s]*/i, '');
-            reply = reply.trim();
-        }
-        
-        // Кэшируем простые вопросы (приветствия, вопросы о личности)
-        if (history.length === 0 && (prompt.length < 30)) {
-            responseCache.set(cacheKey, reply);
-            setTimeout(() => responseCache.delete(cacheKey), 3600000); // Кэш на 1 час
+            reply = reply.replace(/^Привет[!,\s]*/i, '').trim();
         }
         
         return reply || "😊 Я ArtemGPT! Чем могу помочь?";
@@ -187,7 +155,7 @@ app.post('/api/chat', async (req, res) => {
     
     try {
         const history = session.messages;
-        const response = await queryArtemGPTCloud(message, history);
+        const response = await queryArtemGPT(message, history);
         
         session.messages.push(
             { role: 'user', content: message, timestamp: new Date().toISOString() },
@@ -210,7 +178,6 @@ app.post('/api/chat', async (req, res) => {
     }
 });
 
-// Получить все диалоги
 app.get('/api/sessions', (req, res) => {
     res.json({ success: true, sessions: sessions });
 });
@@ -243,14 +210,14 @@ app.delete('/api/sessions/:id', (req, res) => {
     res.json({ success: true });
 });
 
-app.get('/api/test', (req, res) => {
+app.get('/api/status', (req, res) => {
     res.json({
         success: true,
         status: 'online',
         model: MODEL_NAME,
-        identity: 'ArtemGPT',
+        provider: 'OpenRouter',
         sessions_count: sessions.length,
-        cache_size: responseCache.size
+        api_configured: !!API_KEY
     });
 });
 
@@ -260,12 +227,10 @@ if (sessions.length === 0) createNewSession();
 else currentSessionId = sessions[0].id;
 
 app.listen(PORT, () => {
-    console.log(`\n🎭 ARTEMGPT - ОПТИМИЗИРОВАННАЯ ВЕРСИЯ`);
+    console.log(`\n🎭 ARTEMGPT - OPENROUTER ВЕРСИЯ`);
     console.log(`═══════════════════════════════════`);
     console.log(`🚀 Сервер: http://localhost:${PORT}`);
-    console.log(`🤖 Модель: ${MODEL_NAME} ☁️`);
-    console.log(`⚡ Кэширование: включено`);
-    console.log(`💾 Диалогов сохранено: ${sessions.length}`);
-    console.log(`\n💬 Чат готов!`);
-    console.log(`📌 Вопрос "ты какая модель?" -> "Я ArtemGPT!"\n`);
+    console.log(`🤖 Модель: ${MODEL_NAME} (бесплатно)`);
+    console.log(`🔑 API ключ: ${API_KEY ? '✅ настроен' : '❌ не настроен'}`);
+    console.log(`\n💬 Чат: http://localhost:${PORT}\n`);
 });
